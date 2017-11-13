@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+<meta charset="UTF-8" />
+<head>
+    <title>Home</title>
+    <link rel="stylesheet" href="/css/barrager.css" />
+    <script src="/js/sockjs.min.js"></script>
+    <script src="/js/stomp.js"></script>
+    <script src="/js/jquery-3.1.1.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <!--<script src="/js/tinycolor-0.9.15.min.js"></script>-->
+    <script src="/js/jquery.barrager.js"></script>
+</head>
+<body>
+<p>
+    聊天室
+</p>
+
+<form id="wiselyForm">
+    <textarea rows="4" cols="60" name="text"></textarea>
+    <input type="submit"/>
+</form>
+
+<script th:inline="javascript">
+    $('#wiselyForm').submit(function(e){
+        e.preventDefault();
+        var text = $('#wiselyForm').find('textarea[name="text"]').val();
+        sendSpittle(text);
+    });
+    //链接endpoint名称为 "/ws-guide-websocket" 的endpoint。
+    var sock = new SockJS("/ws-guide-websocket");
+    var stomp = Stomp.over(sock);
+    stomp.connect({}, function(frame) {
+
+        /**  订阅了/wechat/message发送的消息,这里在控制器的 convertAndSendToUser 定义的地址保持一致, 
+         *
+         *  */
+
+        stomp.subscribe("/wechat/message", handleNotification);
+    });
+
+
+
+    function handleNotification(message) {
+      //  $('#output').append("<b>Received: " + message.body + "</b><br/>")
+        addDanmu(message.body);
+    }
+
+
+    function addDanmu(message) {
+        var item={
+            img:'', //图片
+            info:message, //文字
+            href:'', //链接
+            close:true, //显示关闭按钮
+            speed:15, //延迟,单位秒,默认8
+//            bottom:70, //距离底部高度,单位px,默认随机
+            color:'#fff000', //颜色,默认白色
+            old_ie_color:'#000000', //ie低版兼容色,不能与网页背景相同,默认黑色
+        }
+        $('body').barrager(item);
+    }
+    
+    function sendSpittle(text) {
+        stomp.send("/wechat/chat", {}, text);// JSON.stringify({ 'name': text })
+    }
+    $('#stop').click(function() {sock.close()});
+</script>
+
+<div id="output"></div>
+</body>
+</html>
