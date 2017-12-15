@@ -2,15 +2,16 @@
 
 <html xmlns:th="http://www.thymeleaf.org">
 <meta charset="UTF-8" />
+<meta name="_ctx" th:content="@{/}" />
 <head>
     <title>Home</title>
-    <link rel="stylesheet" href="/css/barrager.css" />
-    <script src="/js/sockjs.min.js"></script>
-    <script src="/js/stomp.js"></script>
-    <script src="/js/jquery-3.1.1.js"></script>
-    <script src="/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="./css/barrager.css" />
+    <script src="./js/sockjs.min.js"></script>
+    <script src="./js/stomp.js"></script>
+    <script src="./js/jquery-3.1.1.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
     <!--<script src="/js/tinycolor-0.9.15.min.js"></script>-->
-    <script src="/js/jquery.barrager.js"></script>
+    <script src="./js/jquery.barrager.js"></script>
 </head>
 <body>
 <p>
@@ -19,10 +20,13 @@
 
 <form id="wiselyForm">
     <textarea rows="4" cols="60" name="text"></textarea>
-    <input type="submit"/>
+    <input type="submit" value="提交"/>
 </form>
 
 <script th:inline="javascript">
+    //获取文件路径
+//    var _ctx = $("meta[name='_ctx']").attr("content");
+//    _ctx = _ctx.substr(0, _ctx.length - 1);
     $('#wiselyForm').submit(function(e){
         e.preventDefault();
         var text = $('#wiselyForm').find('textarea[name="text"]').val();
@@ -57,8 +61,8 @@
             speed:15, //延迟,单位秒,默认8
 //            bottom:70, //距离底部高度,单位px,默认随机
             color:'#fff000', //颜色,默认白色
-            old_ie_color:'#000000', //ie低版兼容色,不能与网页背景相同,默认黑色
-        }
+            old_ie_color:'#000000' //ie低版兼容色,不能与网页背景相同,默认黑色
+        };
         $('body').barrager(item);
     }
     

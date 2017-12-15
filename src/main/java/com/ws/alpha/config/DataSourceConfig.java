@@ -15,7 +15,7 @@ import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
-@MapperScan(basePackages = "com.ws.spring.dao")
+@MapperScan(basePackages = "com.ws.alpha.dao")
 public class DataSourceConfig {
 //多数据源使用
 //    @Bean
