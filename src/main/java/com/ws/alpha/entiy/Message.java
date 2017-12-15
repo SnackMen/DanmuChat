@@ -20,6 +20,19 @@ public class Message {
      */
     private String message;
 
+    /**
+     * 用户唯一标识符
+     */
+    private String openID;
+
+    public String getOpenID() {
+        return openID;
+    }
+
+    public void setOpenID(String openID) {
+        this.openID = openID;
+    }
+
     public String getNickName() {
         return nickName;
     }
