@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <title>首页</title>
+    <script src="./js/jquery-3.1.1.js"></script>
 </head>
 <body>
 <img id="QrGen" src="" />
@@ -10,7 +11,7 @@
 <script type="text/javascript">
     $(document).ready(function() {
         var uuid;
-        $.get("/qrgen?cmd=showQrGen", function(data, status) {
+        $.get("/qrgen", function(data, status) {
             var obj = eval("(" + data + ")");
             //设置该uuid值
             uuid = obj.uuid;
@@ -22,11 +23,12 @@
 
         function checkScan() {
             setInterval(function() {
-                $.get("/qrgenLogin/qrgen?cmd=checkScan&uuid=" + uuid,
+                $.get("/qrgen?uuid=" + uuid,
                     function(data, status) {
-                        if (data === "ok") {
+                    var obj = eval("(" + data + ")");
+                        if (obj.status === "ONLINE") {
                             //验证成功并重定向到welcome页面
-                            window.location = "welcome.jsp";
+                            window.location = "http://wx.wongwongsu.com";
                         }
                     });
             },4000)
