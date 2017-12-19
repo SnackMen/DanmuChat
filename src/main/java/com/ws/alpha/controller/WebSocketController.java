@@ -37,9 +37,23 @@ public class WebSocketController {
 
     @MessageMapping("/chat")
     public void handleChat(String message) {
+        logger.info("Server-side bullet message forwarding");
         simpMessagingTemplate.convertAndSend("/wechat/message", message);
     }
 
+    @RequestMapping("/danmu")
+    public String danmu(HttpServletRequest request, HttpServletResponse response) {
+        logger.info("Scanned login barrage Hall");
+        JSONObject userInfo = (JSONObject) request.getAttribute("list");
+        if(userInfo != null) {
+            String headUrl = userInfo.getString("headimgurl");
+            logger.info(headUrl);
+            logger.info(userInfo.getString("nickname"));
+            request.setAttribute("headUrl", headUrl);
+        }
+
+        return "danmu";
+    }
 
     @RequestMapping("/")
     public String chat(){
@@ -64,6 +78,7 @@ public class WebSocketController {
 
             String backUrl = "localhost?uuid="+ randomUUID;
 
+
             //生成二维码图片
             try {
                 String url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=appid"
@@ -72,7 +87,6 @@ public class WebSocketController {
                         + "&scope=snsapi_userinfo"
                         + "&state=STATE#wechat_redirect";
                 ByteArrayOutputStream qrOut = QrGenUtil.createQrGen(url);
-//            String fileName = randomUUID + ".jpg";
                 String fileName = randomUUID + ".jpg";
 
                 OutputStream outputStream = new FileOutputStream(new File("/home/tomcat/apache-tomcat-8.5.23/webapps/wx/WEB-INF/classes/static/pic", fileName));
@@ -116,18 +130,17 @@ public class WebSocketController {
             JSONObject jsonObject = JsonObject.doGetJson(url);
             String openid=jsonObject.getString("openid");
             String token=jsonObject.getString("access_token");
-            logger.error(openid + "," + token);
+            logger.info(openid + "," + token);
             String infoUrl="https://api.weixin.qq.com/sns/userinfo?access_token="+token
                     + "&openid="+openid
                     + "&lang=zh_CN";
             JSONObject userInfo = JsonObject.doGetJson(infoUrl);
-            logger.error(userInfo.toString());
+            logger.info(userInfo.toString());
             req.setAttribute("list", userInfo);
             req.getRequestDispatcher("/danmu").forward(req, resp);
         } catch (ServletException | IOException e) {
             logger.error("用户登录出现失败: {}", e.getMessage());
         }
-
 
     }
 

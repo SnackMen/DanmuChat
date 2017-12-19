@@ -14,25 +14,25 @@
         $.get("/qrgen", function(data, status) {
             var obj = eval("(" + data + ")");
             //设置该uuid值
-            uuid = obj.uuid;
+//            uuid = obj.uuid;
             //设置二维码图片地址
             $("#QrGen").attr("src", obj.img);
             //检查验证登录
-            checkScan();
+//            checkScan();
         });
 
-        function checkScan() {
-            setInterval(function() {
-                $.get("/qrgen?uuid=" + uuid,
-                    function(data, status) {
-                    var obj = eval("(" + data + ")");
-                        if (obj.status === "ONLINE") {
-                            //验证成功并重定向到welcome页面
-                            window.location = "http://wx.wongwongsu.com";
-                        }
-                    });
-            },4000)
-        }
+//        function checkScan() {
+//            setInterval(function() {
+//                $.get("/qrgen?uuid=" + uuid,
+//                    function(data, status) {
+//                    var obj = eval("(" + data + ")");
+//                        if (obj.status === "ONLINE") {
+//                            //验证成功并重定向到welcome页面
+//                            window.location = "http://wx.wongwongsu.com";
+//                        }
+//                    });
+//            },4000)
+//        }
 
     });
 </script>
