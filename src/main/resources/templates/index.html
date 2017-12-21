@@ -1,16 +1,28 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:http="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8" />
     <title>首页</title>
     <script src="./js/jquery-3.1.1.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
 </head>
-<body>
-<img id="QrGen" src="" />
+<body style="background: url('http://weixin-1252100560.file.myqcloud.com/background.jpg?sign=jOy9g/caLpDd1PkvJKuLdT0G7v5hPTEyNTIxMDA1NjAmaz1BS0lES1VRN1puN1k2UFNIc0VJRnVLV1RCZXV1Z0RXYXA0VmgmZT0xNTE2MzUyMTYyJnQ9MTUxMzc2MDE2MiZyPTExOTk4MTA2MDQmZj0vYmFja2dyb3VuZC5qcGcmYj13ZWl4aW4=');background-size:cover;">
+<img src="http://weixin-1252100560.file.myqcloud.com/chat.png?sign=Kyy8KPcIwSl6vl2gubolOVTYOf5hPTEyNTIxMDA1NjAmaz1BS0lES1VRN1puN1k2UFNIc0VJRnVLV1RCZXV1Z0RXYXA0VmgmZT0xNTE2MzUxMDEyJnQ9MTUxMzc1OTAxMiZyPTE4MDIyMDQ5OSZmPS9jaGF0LnBuZyZiPXdlaXhpbg=="
+     alt="chat图标" style="width: 35px; height: 35px; left: 80px; top: 80px; position: absolute"/>
+<div class="container">
+    <div class="row">
+        <div class="col-md-offset-4 col-md-4" style="margin-top: 10%; padding-top: 4%; border-radius: 5px 5px; background: white; box-shadow:0 0 3px #000">
+            <img id="QrGen" src="" style="margin-left: auto; margin-right:auto; display:block;" />
+            <p style="font-size: 20px; color: #353535; margin-bottom: 20px; text-align: center">使用手机微信扫码登录</p>
+        </div>
+    </div>
+</div>
+
 
 <script type="text/javascript">
     $(document).ready(function() {
-        var uuid;
+//        var uuid;
         $.get("/qrgen", function(data, status) {
             var obj = eval("(" + data + ")");
             //设置该uuid值
@@ -21,6 +33,7 @@
 //            checkScan();
         });
 
+        //网页端登录，可以使用该方法
 //        function checkScan() {
 //            setInterval(function() {
 //                $.get("/qrgen?uuid=" + uuid,

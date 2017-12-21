@@ -14,6 +14,6 @@ public class QrGenUtil {
     public static ByteArrayOutputStream createQrGen(String url) throws IOException {
 
         //如果有中文，可以使用withCharset("UTF-8")方法
-        return QRCode.from(url).withSize(250,250).to(ImageType.JPG).stream();
+        return QRCode.from(url).withSize(270,270).to(ImageType.JPG).stream();
     }
 }

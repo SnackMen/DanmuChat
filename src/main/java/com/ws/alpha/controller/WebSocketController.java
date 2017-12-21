@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.ServletException;
@@ -42,14 +43,14 @@ public class WebSocketController {
     }
 
     @RequestMapping("/danmu")
-    public String danmu(HttpServletRequest request, HttpServletResponse response) {
+    public String danmu(HttpServletRequest request, Model model) {
         logger.info("Scanned login barrage Hall");
         JSONObject userInfo = (JSONObject) request.getAttribute("list");
         if(userInfo != null) {
             String headUrl = userInfo.getString("headimgurl");
             logger.info(headUrl);
             logger.info(userInfo.getString("nickname"));
-            request.setAttribute("headUrl", headUrl);
+            model.addAttribute("headUrl", headUrl);
         }
 
         return "danmu";
@@ -88,8 +89,8 @@ public class WebSocketController {
                         + "&state=STATE#wechat_redirect";
                 ByteArrayOutputStream qrOut = QrGenUtil.createQrGen(url);
                 String fileName = randomUUID + ".jpg";
-
-                OutputStream outputStream = new FileOutputStream(new File("/home/tomcat/apache-tomcat-8.5.23/webapps/wx/WEB-INF/classes/static/pic", fileName));
+                OutputStream outputStream = new FileOutputStream(new File("E:\\GitWareHouse\\SpringBoot\\DanmuChat\\target\\classes\\static\\pic", fileName));
+//                OutputStream outputStream = new FileOutputStream(new File("/home/tomcat/apache-tomcat-8.5.23/webapps/wx/WEB-INF/classes/static/pic", fileName));
                 outputStream.write(qrOut.toByteArray());
                 outputStream.flush();
                 outputStream.close();

@@ -1,10 +1,22 @@
 <!DOCTYPE html>
 
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:http="http://www.w3.org/1999/xhtml">
 <meta charset="UTF-8" />
-<meta name="_ctx" th:content="@{/}" />
+<meta name="viewport"
+      content="
+    height = [pixel_value | device-height] ,
+    width = [pixel_value | device-width ] ,
+    initial-scale = 0.5 ,
+    minimum-scale = float_value ,
+    maximum-scale = float_value ,
+    user-scalable = [yes | no] ,
+  "
+
+/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<!--<meta name="_ctx" th:content="@{/}" />-->
 <head>
-    <title>Home</title>
+    <title>弹幕大厅</title>
     <link rel="stylesheet" href="./css/barrager.css" />
     <script src="./js/sockjs.min.js"></script>
     <script src="./js/stomp.js"></script>
@@ -12,24 +24,72 @@
     <script src="./js/bootstrap.min.js"></script>
     <!--<script src="/js/tinycolor-0.9.15.min.js"></script>-->
     <script src="./js/jquery.barrager.js"></script>
-</head>
-<body>
-<p>
-    聊天室
-</p>
 
-<form id="wiselyForm">
-    <textarea rows="4" cols="60" name="text"></textarea>
-    <input type="submit" value="提交"/>
-</form>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        .box{
+            width:100%;
+            display: flex;
+        }
+
+        .left_box,.right_box {
+            width:5%;
+            height:100px;
+            margin:10px;
+        }
+        .center_box {
+            flex: 1;
+            height: 100px;
+            padding: 20px;
+            box-shadow:0 0 3px #000;
+            position: relative;
+            background: white;
+            border-radius: 5px 5px;
+
+            /*margin: 10px;*/
+        }
+        .form_box {
+            bottom: 0;
+            width: 100%;
+            position: absolute;
+            padding: 10px 40px 10px 0 ;
+        }
+    </style>
+</head>
+<body style="background: url('http://weixin-1252100560.file.myqcloud.com/background.jpg?sign=LwGkXjAXNDBbcdQBdR/6TZipeBxhPTEyNTIxMDA1NjAmaz1BS0lES1VRN1puN1k2UFNIc0VJRnVLV1RCZXV1Z0RXYXA0VmgmZT0xNTE2NDI4NTA0JnQ9MTUxMzgzNjUwNCZyPTExNzM5MDYyNzImZj0vYmFja2dyb3VuZC5qcGcmYj13ZWl4aW4=');background-size: cover">
+<div class="box">
+    <div class="left_box">
+
+    </div>
+    <div class="center_box">
+        <div class="form_box">
+            <form id="wiselyForm">
+                <input type="text" class="form-control" name="text" placeholder="请输入聊天内容" style="margin-bottom: 15px"/>
+                <input type="submit" class="btn btn-success btn-block" value="提交"/>
+            </form>
+        </div>
+
+    </div>
+    <div class="right_box">
+
+    </div>
+</div>
+
 
 <script th:inline="javascript">
+
+
+    $('.box').height($(window).height());
+    $('.center_box').css({"height":$(window).height()});
+
     //获取文件路径
-//    var _ctx = $("meta[name='_ctx']").attr("content");
-//    _ctx = _ctx.substr(0, _ctx.length - 1);
+
+//        var headUrl = [[${headUrl}]];
+    var headUrl = 'http://weixin-1252100560.file.myqcloud.com/%E5%A4%B4%E5%83%8F.png?sign=xTeaddH6JkcSdhD1L+rON87pMFdhPTEyNTIxMDA1NjAmaz1BS0lES1VRN1puN1k2UFNIc0VJRnVLV1RCZXV1Z0RXYXA0VmgmZT0xNTE2MzQxNjY1JnQ9MTUxMzc0OTY2NSZyPTM0MzQyNzU4OSZmPS8lRTUlQTQlQjQlRTUlODMlOEYucG5nJmI9d2VpeGlu';
     $('#wiselyForm').submit(function(e){
         e.preventDefault();
-        var text = $('#wiselyForm').find('textarea[name="text"]').val();
+        var text = $('#wiselyForm').find('input[name="text"]').val();
         sendSpittle(text);
     });
     //链接endpoint名称为 "/ws-guide-websocket" 的endpoint。
@@ -47,31 +107,36 @@
 
 
     function handleNotification(message) {
-      //  $('#output').append("<b>Received: " + message.body + "</b><br/>")
-        addDanmu(message.body);
+        var messageEntity = JSON.parse(message.body);
+        console.log(messageEntity['name']);
+        addDanmu(messageEntity['name'], messageEntity['url']);
     }
 
 
-    function addDanmu(message) {
+    function addDanmu(message, headUrl) {
         var item={
-            img:'', //图片
+            img: headUrl, //图片
             info:message, //文字
-            href:'#', //链接
+            href:'#', //链接/
             close:true, //显示关闭按钮
-            speed:15, //延迟,单位秒,默认8
+            speed:20, //延迟,单位秒,默认8
 //            bottom:70, //距离底部高度,单位px,默认随机
             color:'#fff000', //颜色,默认白色
             old_ie_color:'#000000' //ie低版兼容色,不能与网页背景相同,默认黑色
         };
         $('body').barrager(item);
     }
-    
+
     function sendSpittle(text) {
-        stomp.send("/wechat/chat", {}, text);// JSON.stringify({ 'name': text })
+//        stomp.send("/wechat/chat", {}, text);// JSON.stringify({ 'name': text })
+        stomp.send("/wechat/chat", {}, JSON.stringify(
+            {
+                'name': text ,
+                'url' : headUrl
+            }
+        ))
     }
     $('#stop').click(function() {sock.close()});
 </script>
-
-<div id="output"></div>
 </body>
 </html>
