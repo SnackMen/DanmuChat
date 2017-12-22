@@ -79,7 +79,6 @@ public class WebSocketController {
 
             String backUrl = "localhost?uuid="+ randomUUID;
 
-
             //生成二维码图片
             try {
                 String url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=appid"
