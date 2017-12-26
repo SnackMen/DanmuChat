@@ -12,13 +12,16 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.UUID;
 
+/**
+ * @author laowang
+ */
 @Component
-public class Send implements RabbitTemplate.ConfirmCallback, RabbitTemplate.ReturnCallback {
+public class Send1 implements RabbitTemplate.ConfirmCallback, RabbitTemplate.ReturnCallback {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    private Logger logger = LoggerFactory.getLogger(Send.class);
+    private Logger logger = LoggerFactory.getLogger(Send1.class);
 
     @PostConstruct
     public void init() {

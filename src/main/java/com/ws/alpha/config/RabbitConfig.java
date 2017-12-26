@@ -19,6 +19,11 @@ public class RabbitConfig {
         return new Queue("danmu.queue", true);
     }
 
+    @Bean
+    public Queue queue1() {
+        return new Queue("hello");
+    }
+
     //声明交换机
     @Bean
     public TopicExchange topicExchange() {

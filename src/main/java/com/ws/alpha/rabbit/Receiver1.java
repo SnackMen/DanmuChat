@@ -11,12 +11,16 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @RabbitListener(queues = "danmu.queue")
-public class Receiver {
-    private static Logger logger = LoggerFactory.getLogger(Receiver.class);
+public class Receiver1 {
+
+    private Logger logger = LoggerFactory.getLogger(Receiver1.class);
 
     @RabbitHandler
-    public void process(String message) {
-        logger.info("receive message : {}", message);
-        System.out.println("receive" + message);
+    public String processMessage(String message) {
+        logger.info(Thread.currentThread().getName() + "get the danmu.queue message");
+        return message;
     }
+
+
+
 }
