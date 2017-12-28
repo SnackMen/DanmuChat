@@ -29,3 +29,4 @@ nbdist/
 /mvnw.cmd
 /src/main/resources/application.properties
 /src/test/
+/src/main/java/com/ws/alpha/util/WechatConstant.java

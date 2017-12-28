@@ -1,8 +1,10 @@
 package com.ws.alpha.controller;
 
+import com.ws.alpha.rabbit.RabbitSender;
 import com.ws.alpha.util.Constant;
 import com.ws.alpha.util.JsonObject;
 import com.ws.alpha.util.QrGenUtil;
+import com.ws.alpha.util.WechatConstant;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +26,7 @@ import java.net.URLEncoder;
 
 
 /**
- * @author mumu
+ * @author laowang
  */
 @Controller
 public class WebSocketController {
@@ -33,13 +35,20 @@ public class WebSocketController {
 
     private Map<String, String> uuidMap = new HashMap<>();
 
+//    @Autowired
+//    private SimpMessagingTemplate simpMessagingTemplate;
+
     @Autowired
-    private SimpMessagingTemplate simpMessagingTemplate;
+    private RabbitSender rabbitSender;
 
     @MessageMapping("/chat")
     public void handleChat(String message) {
         logger.info("Server-side bullet message forwarding");
-        simpMessagingTemplate.convertAndSend("/wechat/message", message);
+        //将消息发送到消息队列中
+        rabbitSender.send(message);
+
+        //将消息转发到/wechat/message下面
+//        simpMessagingTemplate.convertAndSend("/wechat/message", message);
     }
 
     @RequestMapping("/danmu")
@@ -77,18 +86,19 @@ public class WebSocketController {
             //把uuid放入map中
             uuidMap.put(randomUUID.toString(), Constant.OFFLINE);
 
-            String backUrl = "localhost?uuid="+ randomUUID;
+//            String backUrl = "localhost?uuid="+ randomUUID;
+            String backUrl = WechatConstant.URL+ randomUUID;
             //生成二维码图片
             try {
-                String url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=appid"
+                String url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + WechatConstant.APPID
                         + "&redirect_uri="+URLEncoder.encode(backUrl,"UTF-8")
                         + "&response_type=code"
                         + "&scope=snsapi_userinfo"
                         + "&state=STATE#wechat_redirect";
                 ByteArrayOutputStream qrOut = QrGenUtil.createQrGen(url);
                 String fileName = randomUUID + ".jpg";
-                OutputStream outputStream = new FileOutputStream(new File("E:\\GitWareHouse\\SpringBoot\\DanmuChat\\target\\classes\\static\\pic", fileName));
-//                OutputStream outputStream = new FileOutputStream(new File("/home/tomcat/apache-tomcat-8.5.23/webapps/wx/WEB-INF/classes/static/pic", fileName));
+//                OutputStream outputStream = new FileOutputStream(new File("E:\\GitWareHouse\\SpringBoot\\DanmuChat\\target\\classes\\static\\pic", fileName));
+                OutputStream outputStream = new FileOutputStream(new File("/home/tomcat/apache-tomcat-8.5.23/webapps/wx/WEB-INF/classes/static/pic", fileName));
                 outputStream.write(qrOut.toByteArray());
                 outputStream.flush();
                 outputStream.close();
@@ -121,8 +131,8 @@ public class WebSocketController {
     @RequestMapping("/login")
     public void login(HttpServletRequest req, HttpServletResponse resp) {
         String code = req.getParameter("code");
-        String url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=appid"
-                + "&secret=secret"
+        String url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=" + WechatConstant.APPID
+                + "&secret=" + WechatConstant.SECRET
                 + "&code=" + code
                 + "&grant_type=authorization_code";
         try {

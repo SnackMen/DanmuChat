@@ -1,39 +1,42 @@
 package com.ws.alpha.config;
 
+import com.ws.alpha.util.Constant;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * @author laowang
  */
-@Configuration
 public class RabbitConfig {
 
-    //声明队列
+    /**
+     * 客户端发送到服务端的监听队列
+     * @return
+     */
     @Bean
     public Queue queue() {
-        return new Queue("danmu.queue", true);
+        return new Queue(Constant.QUEUE_NAME);
     }
 
+    /**
+     * 客户端直接发送消息到该exchange
+     * @return
+     */
     @Bean
-    public Queue queue1() {
-        return new Queue("hello");
+    public FanoutExchange fanoutExchange() {
+        return new FanoutExchange(Constant.EXCHANGE);
     }
 
-    //声明交换机
-    @Bean
-    public TopicExchange topicExchange() {
-        return new TopicExchange("danmuTopicExchange");
-    }
-
-    //绑定
+    /**
+     * 将exchange和queue进行绑定
+     * @return
+     */
     @Bean
     public Binding binding() {
-        return BindingBuilder.bind(queue()).to(topicExchange()).with("danmu.#");
+        return BindingBuilder.bind(queue()).to(fanoutExchange());
     }
 
 }

@@ -17,5 +17,8 @@ public class Constant {
     public static final String OFFLINE = "OFFLINE";
 
 
+    public static final String EXCHANGE = "danmuFanout";
+
+    public static final String QUEUE_NAME = "danmu";
 
 }
