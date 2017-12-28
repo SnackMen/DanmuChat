@@ -1,6 +1,8 @@
 package com.ws.alpha.controller;
 
+import com.ws.alpha.entiy.UserInfo;
 import com.ws.alpha.rabbit.RabbitSender;
+import com.ws.alpha.service.IUserInfoService;
 import com.ws.alpha.util.Constant;
 import com.ws.alpha.util.JsonObject;
 import com.ws.alpha.util.QrGenUtil;
@@ -9,6 +11,7 @@ import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,30 +39,35 @@ public class WebSocketController {
 
     private Map<String, String> uuidMap = new HashMap<>();
 
-//    @Autowired
-//    private SimpMessagingTemplate simpMessagingTemplate;
-
     @Autowired
     private RabbitSender rabbitSender;
+
+    @Autowired
+    private IUserInfoService iUserInfoService;
 
     @MessageMapping("/chat")
     public void handleChat(String message) {
         logger.info("Server-side bullet message forwarding");
         //将消息发送到消息队列中
         rabbitSender.send(message);
-
-        //将消息转发到/wechat/message下面
-//        simpMessagingTemplate.convertAndSend("/wechat/message", message);
     }
 
     @RequestMapping("/danmu")
     public String danmu(HttpServletRequest request, Model model) {
         logger.info("Scanned login barrage Hall");
         JSONObject userInfo = (JSONObject) request.getAttribute("list");
+        if(userInfo == null) {
+            userInfo = (JSONObject) request.getSession().getAttribute("userInfo");
+        }
+        logger.info("user session: {}", request.getSession().getAttribute("userInfo").toString());
         if(userInfo != null) {
-            String headUrl = userInfo.getString("headimgurl");
+            String headUrl = null;
+            if(Constant.GET_FROM_WE_CHAT.equals(userInfo.getString("from"))) {
+                headUrl = userInfo.getString("headimgurl");
+            }else {
+                headUrl = userInfo.getString("headImgUrl");
+            }
             logger.info(headUrl);
-            logger.info(userInfo.getString("nickname"));
             model.addAttribute("headUrl", headUrl);
         }
 
@@ -138,14 +147,29 @@ public class WebSocketController {
         try {
             JSONObject jsonObject = JsonObject.doGetJson(url);
             String openid=jsonObject.getString("openid");
-            String token=jsonObject.getString("access_token");
-            logger.info(openid + "," + token);
-            String infoUrl="https://api.weixin.qq.com/sns/userinfo?access_token="+token
-                    + "&openid="+openid
-                    + "&lang=zh_CN";
-            JSONObject userInfo = JsonObject.doGetJson(infoUrl);
-            logger.info(userInfo.toString());
-            req.setAttribute("list", userInfo);
+            UserInfo userInfor = iUserInfoService.getUserInfo(openid);
+            HttpSession session = req.getSession();
+            if(userInfor != null) {
+                JSONObject userInfo = JSONObject.fromObject(userInfor);
+                userInfo.put("from", Constant.GET_FROM_SQL);
+                logger.info("get user message from mysql, openId: {}, headImag: {}", userInfor.getOpenId(), userInfor.getHeadImgUrl());
+                logger.info(userInfo.toString());
+                req.setAttribute("list", userInfo);
+                session.setAttribute("userInfo", userInfo);
+            }else {
+                String token=jsonObject.getString("access_token");
+                logger.info("get user message from wechat, oprnId: {}, token: {}", openid, token);
+                String infoUrl="https://api.weixin.qq.com/sns/userinfo?access_token="+token
+                        + "&openid="+openid
+                        + "&lang=zh_CN";
+                JSONObject userInfo = JsonObject.doGetJson(infoUrl);
+                userInfo.put("from", Constant.GET_FROM_WE_CHAT);
+                //缺少插入数据库功能
+
+                logger.info(userInfo.toString());
+                req.setAttribute("list", userInfo);
+                session.setAttribute("userInfo", userInfo);
+            }
             req.getRequestDispatcher("/danmu").forward(req, resp);
         } catch (ServletException | IOException e) {
             logger.error("用户登录出现失败: {}", e.getMessage());

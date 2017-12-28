@@ -22,6 +22,7 @@ public class DataSourceConfig {
 //    public DataSource dataSource(){
 //        return DataSourceBuilder.create().build();
 //    }
+    @Qualifier("dataSource")
     @Autowired
     private DataSource dataSource;
 

@@ -108,8 +108,8 @@
 
     function handleNotification(message) {
         var messageEntity = JSON.parse(message.body);
-        console.log(messageEntity['name']);
-        addDanmu(messageEntity['name'], messageEntity['url']);
+        console.log(messageEntity['message']);
+        addDanmu(messageEntity['message'], messageEntity['url']);
     }
 
 
@@ -131,7 +131,7 @@
 //        stomp.send("/wechat/chat", {}, text);// JSON.stringify({ 'name': text })
         stomp.send("/wechat/chat", {}, JSON.stringify(
             {
-                'name': text ,
+                'message': text ,
                 'url' : headUrl
             }
         ))

@@ -2,6 +2,7 @@ package com.ws.alpha.util;
 
 import java.io.IOException;
 
+import com.ws.alpha.entiy.UserInfo;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -26,6 +27,7 @@ public class JsonObject {
             HttpEntity enyity=response.getEntity();
             if (enyity != null) {
                 String result=EntityUtils.toString(enyity,"UTF-8");
+                logger.info("JSONObject: {}",result);
                 jsonObject=JSONObject.fromObject(result);
             }
             httpGet.releaseConnection();
