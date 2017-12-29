@@ -19,4 +19,9 @@ public class UserInfoServiceImpl implements IUserInfoService {
     public UserInfo getUserInfo(String openId) {
         return iUserInfoDao.getUserInfo(openId);
     }
+
+    @Override
+    public void saveUserInfo(UserInfo userInfo) {
+        iUserInfoDao.saveUserInfo(userInfo);
+    }
 }

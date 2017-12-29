@@ -14,4 +14,10 @@ public interface IUserInfoService {
      */
     UserInfo getUserInfo(String openId);
 
+    /**
+     * 插入用户信息
+     * @param userInfo
+     */
+    void saveUserInfo(UserInfo userInfo);
+
 }

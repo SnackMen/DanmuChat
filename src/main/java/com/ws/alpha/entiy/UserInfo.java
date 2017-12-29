@@ -23,7 +23,7 @@ public class UserInfo implements Serializable {
     private String nickName;
 
     /**
-     * 用户性别 1代表男
+     * 用户性别 1代表男 2代表女
      */
     private String sex;
 

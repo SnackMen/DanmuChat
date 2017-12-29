@@ -163,9 +163,16 @@ public class WebSocketController {
                         + "&openid="+openid
                         + "&lang=zh_CN";
                 JSONObject userInfo = JsonObject.doGetJson(infoUrl);
+                logger.info(userInfo.toString());
+                userInfo.put("privilege", "");
+                UserInfo userInformation = (UserInfo) JSONObject.toBean(userInfo, UserInfo.class);
+                userInformation.setOpenId(userInfo.getString("openid"));
+                userInformation.setProvience(userInfo.getString("province"));
+                userInformation.setNickName(userInfo.getString("nickname"));
+                userInformation.setHeadImgUrl(userInfo.getString("headimgurl"));
+                logger.info("insert into userinfo: {}", userInformation.toString());
                 userInfo.put("from", Constant.GET_FROM_WE_CHAT);
-                //缺少插入数据库功能
-
+                iUserInfoService.saveUserInfo(userInformation);
                 logger.info(userInfo.toString());
                 req.setAttribute("list", userInfo);
                 session.setAttribute("userInfo", userInfo);
